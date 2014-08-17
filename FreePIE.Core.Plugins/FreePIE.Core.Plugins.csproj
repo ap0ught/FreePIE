@@ -85,6 +85,7 @@
     <Compile Include="FreePieIOPlugin.cs" />
     <Compile Include="FreeSpacePlugin.cs" />
     <Compile Include="FreeTrackPlugin.cs" />
+    <Compile Include="GenericComPlugin.cs" />
     <Compile Include="Globals\GlobalIndexer.cs" />
     <Compile Include="HydraPlugin.cs" />
     <Compile Include="Hydra\EmulatedData.cs" />
