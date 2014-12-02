@@ -34,7 +34,7 @@ namespace FreePIE.Core.Plugins
             serialPort.Open();
             Init(serialPort);
 
-            try
+/*            try
             {
                 serialPort.DiscardInBuffer();
             }
@@ -43,7 +43,7 @@ namespace FreePIE.Core.Plugins
                 Console.WriteLine("Exception: " + e);
                 throw;
             }
-
+*/
 
             while (true)
             {
