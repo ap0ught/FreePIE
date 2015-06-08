@@ -167,9 +167,6 @@ namespace FreePIE.Core.Plugins
                 Beep(freq, lapse);
             }
         }
-
-
-
     }
 
     [Global(Name = "speech")]
