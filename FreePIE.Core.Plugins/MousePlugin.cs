@@ -99,7 +99,7 @@ namespace FreePIE.Core.Plugins
                 else
                 {
                     input[0].mi = MouseInput((int)deltaXOut, (int)deltaYOut, (uint)wheel, 0, MouseKeyIO.MOUSEEVENTF_MOVE | MouseKeyIO.MOUSEEVENTF_WHEEL);
-                 }
+                }
 
                 MouseKeyIO.SendInput(1, input, Marshal.SizeOf(input[0].GetType()));
 
