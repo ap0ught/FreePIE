@@ -10,11 +10,6 @@ namespace FreePIE.Core.ScriptEngine.Globals.ScriptHelpers
     [Global(Name = "curves")]
     public class CurveHelper : IScriptHelper
     {
-        public CurveHelper()
-        {
-
-        }
-
         /// <summary>
         /// Create a curve from a list of points
         /// </summary>

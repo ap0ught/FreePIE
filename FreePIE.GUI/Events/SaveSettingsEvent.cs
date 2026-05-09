@@ -4,11 +4,5 @@ using System.Linq;
 
 namespace FreePIE.GUI.Events
 {
-    internal class SaveSettingsEvent
-    {
-        public SaveSettingsEvent()
-        {
-            
-        }
-    }
+    internal class SaveSettingsEvent { }
 }

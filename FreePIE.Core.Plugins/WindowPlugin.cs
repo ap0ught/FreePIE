@@ -91,16 +91,12 @@ namespace FreePIE.Core.Plugins
 
         public bool Start(string processName)
         {
-            var p = Process.Start(processName);
-            if (p == null) return false;
-            return true;
+            return Process.Start(processName) != null;
         }
 
         public bool Start(string processName, string arguments)
         {
-            var p = Process.Start(processName, arguments);
-            if (p == null) return false;
-            return true;
+            return Process.Start(processName, arguments) != null;
         }
 
         public bool Close(string processName)

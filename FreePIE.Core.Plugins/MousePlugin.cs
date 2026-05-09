@@ -22,6 +22,7 @@ namespace FreePIE.Core.Plugins
         public float absoluteY = -1;
         private int wheel;
         public const int WheelMax = 120;
+        /// Maximum value for Windows absolute mouse coordinate system (0-65535 range per axis)
         public const float AbsoluteCoordinateMax = 65535;
 
         private DirectInput directInputInstance = new DirectInput();
@@ -98,11 +99,13 @@ namespace FreePIE.Core.Plugins
                 {
                     if (absoluteX == -1)
                     {
+                        // +1 ensures value stays in valid range after int truncation when at max
                         absoluteX = (float)Cursor.Position.X / SystemInformation.VirtualScreen.Width * AbsoluteCoordinateMax + 1;
                     }
 
                     if (absoluteY == -1)
                     {
+                        // +1 ensures value stays in valid range after int truncation when at max
                         absoluteY = (float)Cursor.Position.Y / SystemInformation.VirtualScreen.Height * AbsoluteCoordinateMax + 1;
                     }
 
