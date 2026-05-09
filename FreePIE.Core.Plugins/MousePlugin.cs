@@ -6,6 +6,8 @@ using FreePIE.Core.Contracts;
 using FreePIE.Core.Plugins.Strategies;
 using SlimDX.DirectInput;
 using SlimDX.RawInput;
+using System.Windows.Forms;
+using System.Drawing;
 
 namespace FreePIE.Core.Plugins
 {
@@ -16,8 +18,12 @@ namespace FreePIE.Core.Plugins
         // Mouse position state variables
         private double deltaXOut;
         private double deltaYOut;
+        public float absoluteX = -1;
+        public float absoluteY = -1;
         private int wheel;
         public const int WheelMax = 120;
+        /// Maximum value for Windows absolute mouse coordinate system (0-65535 range per axis)
+        public const float AbsoluteCoordinateMax = 65535;
 
         private DirectInput directInputInstance = new DirectInput();
         private Mouse mouseDevice;
@@ -25,6 +31,8 @@ namespace FreePIE.Core.Plugins
         private bool leftPressed;
         private bool rightPressed;
         private bool middlePressed;
+        private bool x1Pressed;
+        private bool x2Pressed;
         private GetPressedStrategy<int> getButtonPressedStrategy;
         private SetPressedStrategy setButtonPressedStrategy;
 
@@ -82,12 +90,31 @@ namespace FreePIE.Core.Plugins
         public override void DoBeforeNextExecute()
         {
             // If a mouse command was given in the script, issue it all at once right here
-            if ((int)deltaXOut != 0 || (int)deltaYOut != 0 || wheel != 0)
+            if ((int)deltaXOut != 0 || (int)deltaYOut != 0 || wheel != 0 || absoluteX != -1 || absoluteY != -1)
             {
 
                 var input = new MouseKeyIO.INPUT[1];
                 input[0].type = MouseKeyIO.INPUT_MOUSE;
-                input[0].mi = MouseInput((int)deltaXOut, (int)deltaYOut, (uint)wheel, 0, MouseKeyIO.MOUSEEVENTF_MOVE | MouseKeyIO.MOUSEEVENTF_WHEEL);
+                if (absoluteX != -1 || absoluteY != -1)
+                {
+                    if (absoluteX == -1)
+                    {
+                        // +1 ensures value stays in valid range after int truncation when at max
+                        absoluteX = (float)Cursor.Position.X / SystemInformation.VirtualScreen.Width * AbsoluteCoordinateMax + 1;
+                    }
+
+                    if (absoluteY == -1)
+                    {
+                        // +1 ensures value stays in valid range after int truncation when at max
+                        absoluteY = (float)Cursor.Position.Y / SystemInformation.VirtualScreen.Height * AbsoluteCoordinateMax + 1;
+                    }
+
+                    input[0].mi = MouseInput((int)absoluteX, (int)absoluteY, (uint)wheel, 0, MouseKeyIO.MOUSEEVENTF_MOVE | MouseKeyIO.MOUSEEVENTF_WHEEL | MouseKeyIO.MOUSEEVENTF_ABSOLUTE);
+                }
+                else
+                {
+                    input[0].mi = MouseInput((int)deltaXOut, (int)deltaYOut, (uint)wheel, 0, MouseKeyIO.MOUSEEVENTF_MOVE | MouseKeyIO.MOUSEEVENTF_WHEEL);
+                }
 
                 MouseKeyIO.SendInput(1, input, Marshal.SizeOf(input[0].GetType()));
 
@@ -101,6 +128,8 @@ namespace FreePIE.Core.Plugins
                     deltaYOut = deltaYOut - (int)deltaYOut;
                 }
 
+                absoluteX = -1;
+                absoluteY = -1;
                 wheel = 0;
             }
 
@@ -170,6 +199,7 @@ namespace FreePIE.Core.Plugins
         public void SetButtonPressed(int index, bool pressed)
         {
             uint btn_flag = 0;
+            uint btn_data = 0;
             if (index == 0)
             {
                if (pressed)
@@ -198,6 +228,47 @@ namespace FreePIE.Core.Plugins
                }
                rightPressed = pressed;
             }
+            else if (index == 3)
+            {
+                if (pressed)
+                {
+                    if (!x1Pressed)
+                    {
+
+                        btn_data = MouseKeyIO.XBUTTON1;
+                        btn_flag = MouseKeyIO.MOUSEEVENTF_XDOWN;
+                    }
+                }
+                else
+                {
+                    if (x1Pressed)
+                    {
+                        btn_data = MouseKeyIO.XBUTTON1;
+                        btn_flag = MouseKeyIO.MOUSEEVENTF_XUP;
+                    }
+                }
+                x1Pressed = pressed;
+            }
+            else if (index == 4)
+            {
+                if (pressed)
+                {
+                    if (!x2Pressed)
+                    {
+                        btn_data = MouseKeyIO.XBUTTON2;
+                        btn_flag = MouseKeyIO.MOUSEEVENTF_XDOWN;
+                    }
+                }
+                else
+                {
+                    if (x2Pressed)
+                    {
+                        btn_data = MouseKeyIO.XBUTTON2;
+                        btn_flag = MouseKeyIO.MOUSEEVENTF_XUP;
+                    }
+                }
+                x2Pressed = pressed;
+            }
             else
             {
                if (pressed)
@@ -216,7 +287,7 @@ namespace FreePIE.Core.Plugins
             if (btn_flag != 0) {
                var input = new MouseKeyIO.INPUT[1];
                input[0].type = MouseKeyIO.INPUT_MOUSE;
-               input[0].mi = MouseInput(0, 0, 0, 0, btn_flag);
+               input[0].mi = MouseInput(0, 0, btn_data, 0, btn_flag);
             
                MouseKeyIO.SendInput(1, input, Marshal.SizeOf(input[0].GetType()));
             }
@@ -260,6 +331,18 @@ namespace FreePIE.Core.Plugins
             set { plugin.DeltaY = value; }
         }
 
+        public int x
+        {
+            get { return Cursor.Position.X; }
+            set { plugin.absoluteX = (float)value / SystemInformation.VirtualScreen.Width * MousePlugin.AbsoluteCoordinateMax; }
+        }
+
+        public int y
+        {
+            get { return Cursor.Position.Y; }
+            set { plugin.absoluteY = (float)value / SystemInformation.VirtualScreen.Height * MousePlugin.AbsoluteCoordinateMax; }
+        }
+
         public int wheel
         {
             get { return plugin.Wheel; }
@@ -294,6 +377,18 @@ namespace FreePIE.Core.Plugins
         {
             get { return plugin.IsButtonDown(1); }
             set { plugin.SetButtonPressed(1, value); }
+        }
+
+        public bool x1Button
+        {
+            get { return plugin.IsButtonDown(3); }
+            set { plugin.SetButtonPressed(3, value); }
+        }
+
+        public bool x2Button
+        {
+            get { return plugin.IsButtonDown(4); }
+            set { plugin.SetButtonPressed(4, value); }
         }
 
         public bool getButton(int button)
