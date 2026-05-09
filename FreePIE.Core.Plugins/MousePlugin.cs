@@ -34,6 +34,7 @@ namespace FreePIE.Core.Plugins
         private bool x2Pressed;
         private SetPressedStrategy setButtonPressedStrategy;
         private GetHeldDownStrategy<int> getButtonHeldDownStrategy;
+        private const int AbsoluteMouseMaxCoordinate = 65535;
 
         public override object CreateGlobal()
         {
@@ -98,12 +99,12 @@ namespace FreePIE.Core.Plugins
                 {
                     if (absoluteX == -1)
                     {
-                        absoluteX = (float)Cursor.Position.X / SystemInformation.VirtualScreen.Width * 65535+1;
+                        absoluteX = (float)Cursor.Position.X / SystemInformation.VirtualScreen.Width * AbsoluteMouseMaxCoordinate + 1;
                     }
 
                     if (absoluteY == -1)
                     {
-                        absoluteY = (float)Cursor.Position.Y / SystemInformation.VirtualScreen.Height * 65535+1;
+                        absoluteY = (float)Cursor.Position.Y / SystemInformation.VirtualScreen.Height * AbsoluteMouseMaxCoordinate + 1;
                     }
                     
                     input[0].mi = MouseInput((int)absoluteX, (int)absoluteY, (uint)wheel, 0, MouseKeyIO.MOUSEEVENTF_MOVE | MouseKeyIO.MOUSEEVENTF_WHEEL | MouseKeyIO.MOUSEEVENTF_ABSOLUTE);
