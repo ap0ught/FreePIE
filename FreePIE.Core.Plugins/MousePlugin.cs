@@ -22,6 +22,7 @@ namespace FreePIE.Core.Plugins
         public float absoluteY = -1;
         private int wheel;
         public const int WheelMax = 120;
+        public const float AbsoluteCoordinateMax = 65535;
 
         private DirectInput directInputInstance = new DirectInput();
         private Mouse mouseDevice;
@@ -97,12 +98,12 @@ namespace FreePIE.Core.Plugins
                 {
                     if (absoluteX == -1)
                     {
-                        absoluteX = (float)Cursor.Position.X / SystemInformation.VirtualScreen.Width * 65535 + 1;
+                        absoluteX = (float)Cursor.Position.X / SystemInformation.VirtualScreen.Width * AbsoluteCoordinateMax + 1;
                     }
 
                     if (absoluteY == -1)
                     {
-                        absoluteY = (float)Cursor.Position.Y / SystemInformation.VirtualScreen.Height * 65535 + 1;
+                        absoluteY = (float)Cursor.Position.Y / SystemInformation.VirtualScreen.Height * AbsoluteCoordinateMax + 1;
                     }
 
                     input[0].mi = MouseInput((int)absoluteX, (int)absoluteY, (uint)wheel, 0, MouseKeyIO.MOUSEEVENTF_MOVE | MouseKeyIO.MOUSEEVENTF_WHEEL | MouseKeyIO.MOUSEEVENTF_ABSOLUTE);
@@ -330,13 +331,13 @@ namespace FreePIE.Core.Plugins
         public int x
         {
             get { return Cursor.Position.X; }
-            set { plugin.absoluteX = (float)value / SystemInformation.VirtualScreen.Width * 65535; }
+            set { plugin.absoluteX = (float)value / SystemInformation.VirtualScreen.Width * MousePlugin.AbsoluteCoordinateMax; }
         }
 
         public int y
         {
             get { return Cursor.Position.Y; }
-            set { plugin.absoluteY = (float)value / SystemInformation.VirtualScreen.Height * 65535; }
+            set { plugin.absoluteY = (float)value / SystemInformation.VirtualScreen.Height * MousePlugin.AbsoluteCoordinateMax; }
         }
 
         public int wheel

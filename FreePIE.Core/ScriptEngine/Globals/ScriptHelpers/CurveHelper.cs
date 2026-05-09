@@ -23,7 +23,7 @@ namespace FreePIE.Core.ScriptEngine.Globals.ScriptHelpers
         public CurveGlobalProvider.CurveGlobal create(double minimum, double maximum, params double[] points)
         {
 
-            var pointz = new List<Point>() { new Point(minimum, minimum) };
+            var curvePoints = new List<Point>() { new Point(minimum, minimum) };
 
             // ensure that all of the points values are between the minimum and maximum
 
@@ -31,11 +31,11 @@ namespace FreePIE.Core.ScriptEngine.Globals.ScriptHelpers
                 throw new Exception("All points must be between the minimum and maximum values");
 
 
-            pointz.AddRange(points.Select((x, i) => new { x, i }).GroupBy(p => p.i / 2).Select(g => new Point(g.First().x, g.Last().x)));
+            curvePoints.AddRange(points.Select((x, i) => new { x, i }).GroupBy(p => p.i / 2).Select(g => new Point(g.First().x, g.Last().x)));
 
-            pointz.Add(new Point(maximum, maximum));
+            curvePoints.Add(new Point(maximum, maximum));
 
-            return new CurveGlobalProvider.CurveGlobal(new Curve(Guid.NewGuid().ToString(), pointz) { ValidateCurve = true });
+            return new CurveGlobalProvider.CurveGlobal(new Curve(Guid.NewGuid().ToString(), curvePoints) { ValidateCurve = true });
         }
 
     }

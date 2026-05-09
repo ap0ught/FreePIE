@@ -102,9 +102,9 @@ namespace FreePIE.GUI.Views.Curves
             {
                 Clipboard.SetDataObject(python);
             }
-            catch (Exception x)
+            catch (Exception)
             {
-
+                // Clipboard operations can fail if another process has locked the clipboard; silently ignore.
             }
 
         }
